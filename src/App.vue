@@ -1,27 +1,38 @@
 <template>
   <div id="app">
-    <BookSearch title="The Bookstore" />
+    <landing-page title="The Bookstore" />
   </div>
 </template>
 
 <script>
-import BookSearch from "./components/BookSearch.vue";
+import LandingPage from "./components/LandingPage.vue";
 
 export default {
   name: "App",
   components: {
-    BookSearch,
+    LandingPage,
   },
 };
 </script>
 
-<style>
+<style lang="scss">
+html {
+  height: 100%;
+  width: 100%;
+  font-family: "Fira Sans", sans-serif;
+}
+
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  padding: 60px;
+}
+
+@media (max-width: 767px) {
+  /* CSS styles for small screens */
+  #app {
+    padding: 30px;
+  }
 }
 </style>

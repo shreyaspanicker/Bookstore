@@ -1,4 +1,6 @@
 # bookstore
+A bookstore you can't afford to miss
+
 
 ## Project setup
 ```

@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <landing-page title="The Bookstore" />
+    <landing-page :header="header" />
   </div>
 </template>
 
@@ -11,6 +11,14 @@ export default {
   name: "App",
   components: {
     LandingPage,
+  },
+  computed: {
+    header() {
+      return {
+        title: this.$store.state.header.title,
+        tagline: this.$store.state.header.tagline,
+      };
+    },
   },
 };
 </script>

@@ -34,13 +34,17 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-  padding: 60px;
+  nav {
+    padding: 60px;
+  }
 }
 
 @media (max-width: 767px) {
   /* CSS styles for small screens */
   #app {
-    padding: 30px;
+    nav {
+      padding: 30px;
+    }
   }
 }
 </style>

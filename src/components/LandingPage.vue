@@ -1,15 +1,17 @@
 <template>
   <div class="content">
-    <header-section :header="header" />
-    <search-box />
-
-    <div class="display-books"></div>
+    <nav>
+      <header-section :header="header" />
+      <search-box />
+    </nav>
+    <display-books />
   </div>
 </template>
 
 <script>
 import HeaderSection from "./HeaderSection.vue";
 import SearchBox from "./SearchBox.vue";
+import DisplayBooks from "./DisplayBooks.vue";
 
 export default {
   name: "LandingPage",
@@ -22,9 +24,10 @@ export default {
   components: {
     SearchBox,
     HeaderSection,
+    DisplayBooks,
   },
   props: {
-    header: String,
+    header: Object,
   },
 };
 </script>

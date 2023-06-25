@@ -6,7 +6,7 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
   state: {
     header: {
-      title: "The Bookstore",
+      title: "Bookstore",
       tagline: "The store you can't afford to miss",
     },
   },

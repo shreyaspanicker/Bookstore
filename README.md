@@ -1,6 +1,6 @@
 # Bookstore
 
-A store you can't afford to miss
+The store you can't afford to miss
 
 ## Project setup
 

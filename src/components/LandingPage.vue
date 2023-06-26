@@ -2,9 +2,9 @@
   <div class="content">
     <nav>
       <header-section :header="header" />
-      <search-box />
+      <search-box @clear="isCleared = true" @searchedWith="searchFor" />
     </nav>
-    <display-books />
+    <display-books :searchedQuery="searchedQuery" :isCleared="isCleared" />
   </div>
 </template>
 
@@ -17,7 +17,8 @@ export default {
   name: "LandingPage",
   data() {
     return {
-      books: [],
+      isCleared: true,
+      searchedQuery: "",
     };
   },
   computed: {},
@@ -28,6 +29,11 @@ export default {
   },
   props: {
     header: Object,
+  },
+  methods: {
+    searchFor(value) {
+      this.searchedQuery = value;
+    },
   },
 };
 </script>

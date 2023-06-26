@@ -4,9 +4,10 @@
       type="text"
       placeholder="Type in book or author name..."
       v-model="userInput"
-      @keydown="handleKeyDown"
+      @keydown.enter="searchForBooks"
+      @keydown.esc="clearSearch"
     />
-    <uil-arrow-circle-right size="30px" class="logo" @click="searchBooks" />
+    <uil-arrow-circle-right size="30px" class="logo" @click="searchForBooks" />
   </div>
 </template>
 
@@ -24,8 +25,14 @@ export default {
     UilArrowCircleRight,
   },
   methods: {
-    searchBooks() {},
-    handleKeyDown() {},
+    clearSearch() {
+      this.userInput = "";
+      this.$emit("clear");
+    },
+    searchForBooks() {
+      this.$emit("searchedWith", this.userInput);
+      this.userInput = "";
+    },
   },
 };
 </script>

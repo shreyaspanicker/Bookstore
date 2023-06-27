@@ -7,12 +7,12 @@
       @keydown.enter="searchForBooks"
       @keydown.esc="clearSearch"
     />
-    <uil-arrow-circle-right size="30px" class="logo" @click="searchForBooks" />
+    <uil-search-alt size="30px" class="logo" @click="searchForBooks" />
   </div>
 </template>
 
 <script>
-import { UilArrowCircleRight } from "@iconscout/vue-unicons";
+import { UilSearchAlt } from "@iconscout/vue-unicons";
 
 export default {
   name: "SearchBox",
@@ -22,7 +22,7 @@ export default {
     };
   },
   components: {
-    UilArrowCircleRight,
+    UilSearchAlt,
   },
   methods: {
     clearSearch() {

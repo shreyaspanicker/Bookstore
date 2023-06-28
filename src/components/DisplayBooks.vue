@@ -1,98 +1,94 @@
 <template>
-  <section>
-    <div class="books-container">
-      <div
-        class="book-container"
-        v-for="book in paginatedItems"
-        :key="`${book.id}_${book.etag}`"
-      >
-        <div class="book-image">
-          <img
-            :src="
-              book.volumeInfo.imageLinks
-                ? book.volumeInfo.imageLinks.thumbnail
-                : 'images/no-preview.png'
-            "
-            style="width: 150px; height: 200px"
-            alt=""
-          />
-        </div>
-        <div class="book-details">
-          <div class="book-title">{{ book.volumeInfo.title }}</div>
-          <div
-            class="book-authors"
-            v-if="
-              book.volumeInfo.authors && book.volumeInfo.authors.length !== 0
-            "
-          >
-            By:
-            <span
-              v-for="(author, index) in book.volumeInfo.authors"
-              :key="`${index}_${book.volumeInfo.contentVersion}`"
-            >
-              {{ author
-              }}<span v-show="index + 1 !== book.volumeInfo.authors.length"
-                >,</span
-              >
-            </span>
-          </div>
-          <div
-            class="rating-container"
-            :id="`r-${book.id}`"
-            v-if="book.volumeInfo.averageRating"
-          >
-            <span class="rating-star"></span>
-            <span class="rating-star"></span>
-            <span class="rating-star"></span>
-            <span class="rating-star"></span>
-            <span class="rating-star"></span>
-            <span class="rating-count"
-              >({{ book.volumeInfo.ratingsCount }})</span
-            >
-          </div>
-        </div>
+  <div class="books-container">
+    <resize-observer @notify="handleResize" />
+    <div
+      class="book-container"
+      v-for="book in paginatedItems"
+      :key="`${book.id}_${book.etag}`"
+      @click="$emit('bookClicked', book.id, paginatedItems)"
+    >
+      <div class="book-image">
+        <img
+          :src="
+            book.volumeInfo.imageLinks
+              ? book.volumeInfo.imageLinks.thumbnail
+              : 'images/no-preview.png'
+          "
+          style="width: 150px; height: 200px"
+          alt=""
+        />
       </div>
-      <div class="pagination" v-if="this.books.length">
-        <button
-          @click="
-            {
-              currentPage = 1;
-              scrollToTop();
-            }
-          "
-          :disabled="this.currentPage === 1"
+      <div class="book-details">
+        <div class="book-title">{{ book.volumeInfo.title }}</div>
+        <div
+          class="book-authors"
+          v-if="book.volumeInfo.authors && book.volumeInfo.authors.length !== 0"
         >
-          <uil-angle-double-left />
-        </button>
-        <button @click="previousPage" :disabled="this.currentPage === 1">
-          <uil-angle-left />
-        </button>
-        <button
-          class=""
-          @click="pageClick"
-          v-for="page in paginationRange"
-          :key="page"
-          :class="page == currentPage ? 'active' : ''"
+          By:
+          <span
+            v-for="(author, index) in book.volumeInfo.authors"
+            :key="`${index}_${book.volumeInfo.contentVersion}`"
+          >
+            {{ author
+            }}<span v-show="index + 1 !== book.volumeInfo.authors.length"
+              >,</span
+            >
+          </span>
+        </div>
+        <div
+          class="rating-container"
+          :id="`r-${book.id}`"
+          v-if="book.volumeInfo.averageRating"
         >
-          {{ page }}
-        </button>
-        <button @click="nextPage" :disabled="currentPage === totalPages">
-          <uil-angle-right />
-        </button>
-        <button
-          @click="
-            {
-              currentPage = totalPages;
-              scrollToTop();
-            }
-          "
-          :disabled="currentPage === totalPages"
-        >
-          <uil-angle-double-right />
-        </button>
+          <span class="rating-star"></span>
+          <span class="rating-star"></span>
+          <span class="rating-star"></span>
+          <span class="rating-star"></span>
+          <span class="rating-star"></span>
+          <span class="rating-count">({{ book.volumeInfo.ratingsCount }})</span>
+        </div>
       </div>
     </div>
-  </section>
+    <div class="pagination" v-if="this.books.length">
+      <button
+        @click="
+          {
+            currentPage = 1;
+            scrollToTop();
+          }
+        "
+        :disabled="this.currentPage === 1"
+      >
+        <uil-angle-double-left />
+      </button>
+      <button @click="previousPage" :disabled="this.currentPage === 1">
+        <uil-angle-left />
+      </button>
+      <button
+        class=""
+        @click="pageClick"
+        v-for="page in paginationRange"
+        :key="page"
+        :class="page == currentPage ? 'active' : ''"
+      >
+        {{ page }}
+      </button>
+      <button @click="nextPage" :disabled="currentPage === totalPages">
+        <uil-angle-right />
+      </button>
+      <button
+        @click="
+          {
+            currentPage = totalPages;
+            scrollToTop();
+          }
+        "
+        :disabled="currentPage === totalPages"
+      >
+        <uil-angle-double-right />
+      </button>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -104,16 +100,19 @@ import {
   UilAngleDoubleRight,
 } from "@iconscout/vue-unicons";
 
+import "vue-resize/dist/vue-resize.css";
+
 export default {
   name: "DisplayBooks",
   data() {
     return {
       books: [],
+      totalResults: 240,
       maxResults: 40,
       currentPage: 1,
-      perPage: 15,
+      perPage: 16,
       searchQuery: "*",
-      API_KEY: "AIzaSyCwlbgBM67RYpZogADG8luKN12sFO1fW4Y",
+      API_KEY: "AIzaSyCjaKpdcjdAG_yZBm5vKvZzYoJZ41RE-vY",
     };
   },
   components: {
@@ -174,7 +173,6 @@ export default {
       axios
         .get(apiURL)
         .then((response) => {
-          this.totalResults = response.data.totalItems;
           this.books.push(...this.randomSort(response.data.items));
           if (startIndex + this.maxResults < this.totalResults) {
             startIndex += this.maxResults;
@@ -241,6 +239,10 @@ export default {
       }
       return arr;
     },
+    handleResize({ width }) {
+      if (width < 1340) this.perPage = 18;
+      else this.perPage = 16;
+    },
   },
 };
 </script>
@@ -250,13 +252,13 @@ export default {
   padding: 0px 60px;
   display: grid;
   justify-content: center;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-gap: 15px;
   .book-container {
     display: flex;
     padding: 20px;
     background-color: #fff;
-    border-radius: 10px;
+    border-radius: 3px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s, box-shadow 0.3s;
     &:hover {
@@ -295,7 +297,7 @@ export default {
   }
   .pagination {
     padding: 20px;
-    grid-column: 1 / span 3; /* Span the item across all three columns */
+    grid-column: 1 / span 4; /* Span the item across all three columns */
     text-align: center; /* Center the item horizontally */
     position: relative;
     button {
@@ -324,20 +326,38 @@ export default {
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 1340px) {
   /* CSS styles for small screens */
 
   .books-container {
-    padding: 30px;
-    grid-template-columns: 1fr 1fr;
+    // padding: 30px;
+    grid-template-columns: 1fr 1fr 1fr;
+    .pagination {
+      grid-column: 1 / span 3;
+    }
   }
 }
-@media (max-width: 460px) {
+@media (max-width: 995px) {
+  /* CSS styles for small screens */
+
+  .books-container {
+    // padding: 30px;
+    grid-template-columns: 1fr 1fr;
+
+    .pagination {
+      grid-column: 1 / span 2;
+    }
+  }
+}
+@media (max-width: 660px) {
   /* CSS styles for small screens */
 
   .books-container {
     padding: 30px;
     grid-template-columns: 1fr;
+    .pagination {
+      grid-column: 1 / span 1;
+    }
   }
 }
 </style>

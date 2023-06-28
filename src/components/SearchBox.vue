@@ -7,7 +7,9 @@
       @keydown.enter="searchForBooks"
       @keydown.esc="clearSearch"
     />
-    <uil-search-alt size="30px" class="logo" @click="searchForBooks" />
+    <span class="logo" @click="searchForBooks"
+      ><uil-search-alt size="30px"
+    /></span>
   </div>
 </template>
 
@@ -31,7 +33,6 @@ export default {
     },
     searchForBooks() {
       this.$emit("searchedWith", this.userInput);
-      this.userInput = "";
     },
   },
 };
@@ -49,6 +50,10 @@ export default {
     border-bottom: 1px solid #2c3e50;
     font-family: "Fira Sans", sans-serif;
     font-size: 16px;
+  }
+  .logo {
+    cursor: pointer;
+    display: flex;
   }
 }
 

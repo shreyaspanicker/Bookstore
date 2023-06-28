@@ -1,6 +1,10 @@
 <template>
   <div id="app">
-    <landing-page :header="header" />
+    <landing-page
+      :header="header"
+      @stopPageScroll="settings.suppressScrollY = true"
+      @startPageScroll="settings.suppressScrollY = false"
+    />
   </div>
 </template>
 
@@ -24,10 +28,21 @@ export default {
 </script>
 
 <style lang="scss">
-html {
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  overflow-x: clip;
   height: 100%;
   width: 100%;
+  margin: 0px !important;
+  padding: 0px !important;
   font-family: "Fira Sans", sans-serif;
+  &.modal-active {
+    overflow: hidden;
+  }
 }
 
 #app {

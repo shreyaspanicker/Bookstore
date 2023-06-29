@@ -1,0 +1,25 @@
+{
+  "categories": [
+    {
+      "value": "All Categories",
+      "id": "q",
+      "placeHolder": "Type in title, author or subject"
+    },
+    { "value": "Title", "id": "title", "placeHolder": "Type in book name" },
+    {
+      "value": "Author",
+      "id": "author",
+      "placeHolder": "Type in author name"
+    },
+    {
+      "value": "Subject",
+      "id": "subject",
+      "placeHolder": "Type in subject of a book"
+    },
+    {
+      "value": "Language",
+      "id": "langRestrict",
+      "placeHolder": "Type in language code of book"
+    }
+  ]
+}

@@ -1,94 +1,104 @@
 <template>
-  <div class="books-container">
-    <resize-observer @notify="handleResize" />
-    <div
-      class="book-container"
-      v-for="book in paginatedItems"
-      :key="`${book.id}_${book.etag}`"
-      @click="$emit('bookClicked', book.id, paginatedItems)"
-    >
-      <div class="book-image">
-        <img
-          :src="
-            book.volumeInfo.imageLinks
-              ? book.volumeInfo.imageLinks.thumbnail
-              : 'images/no-preview.png'
-          "
-          style="width: 150px; height: 200px"
-          alt=""
-        />
-      </div>
-      <div class="book-details">
-        <div class="book-title">{{ book.volumeInfo.title }}</div>
-        <div
-          class="book-authors"
-          v-if="book.volumeInfo.authors && book.volumeInfo.authors.length !== 0"
-        >
-          By:
-          <span
-            v-for="(author, index) in book.volumeInfo.authors"
-            :key="`${index}_${book.volumeInfo.contentVersion}`"
+  <section>
+    <display-message
+      :queryDisplay="queryDisplay"
+      :isLoaded="books.length"
+    ></display-message>
+    <div class="books-container">
+      <resize-observer @notify="handleResize" />
+      <div
+        class="book-container"
+        v-for="book in paginatedItems"
+        :key="`${book.id}_${book.etag}`"
+        @click="$emit('bookClicked', book.id, paginatedItems)"
+      >
+        <div class="book-image">
+          <img
+            :src="
+              book.volumeInfo.imageLinks
+                ? book.volumeInfo.imageLinks.thumbnail
+                : 'images/no-preview.png'
+            "
+            style="width: 150px; height: 200px"
+            alt=""
+          />
+        </div>
+        <div class="book-details">
+          <div class="book-title">{{ book.volumeInfo.title }}</div>
+          <div
+            class="book-authors"
+            v-if="
+              book.volumeInfo.authors && book.volumeInfo.authors.length !== 0
+            "
           >
-            {{ author
-            }}<span v-show="index + 1 !== book.volumeInfo.authors.length"
-              >,</span
+            By:
+            <span
+              v-for="(author, index) in book.volumeInfo.authors"
+              :key="`${index}_${book.volumeInfo.contentVersion}`"
             >
-          </span>
-        </div>
-        <div
-          class="rating-container"
-          :id="`r-${book.id}`"
-          v-if="book.volumeInfo.averageRating"
-        >
-          <span class="rating-star"></span>
-          <span class="rating-star"></span>
-          <span class="rating-star"></span>
-          <span class="rating-star"></span>
-          <span class="rating-star"></span>
-          <span class="rating-count">({{ book.volumeInfo.ratingsCount }})</span>
+              {{ author
+              }}<span v-show="index + 1 !== book.volumeInfo.authors.length"
+                >,</span
+              >
+            </span>
+          </div>
+          <div
+            class="rating-container"
+            :id="`r-${book.id}`"
+            v-if="book.volumeInfo.averageRating"
+          >
+            <span class="rating-star"></span>
+            <span class="rating-star"></span>
+            <span class="rating-star"></span>
+            <span class="rating-star"></span>
+            <span class="rating-star"></span>
+            <span class="rating-count"
+              >({{ book.volumeInfo.ratingsCount }})</span
+            >
+          </div>
         </div>
       </div>
+      <div class="pagination" v-if="this.books.length">
+        <button
+          @click="
+            {
+              currentPage = 1;
+              scrollToTop();
+            }
+          "
+          :disabled="this.currentPage === 1"
+        >
+          <uil-angle-double-left />
+        </button>
+        <button @click="previousPage" :disabled="this.currentPage === 1">
+          <uil-angle-left />
+        </button>
+        <button
+          class=""
+          @click="pageClick"
+          v-for="page in paginationRange"
+          :key="page"
+          :class="page == currentPage ? 'active' : ''"
+        >
+          {{ page }}
+        </button>
+        <button @click="nextPage" :disabled="currentPage === totalPages">
+          <uil-angle-right />
+        </button>
+        <button
+          @click="
+            {
+              currentPage = totalPages;
+              scrollToTop();
+            }
+          "
+          :disabled="currentPage === totalPages"
+        >
+          <uil-angle-double-right />
+        </button>
+      </div>
     </div>
-    <div class="pagination" v-if="this.books.length">
-      <button
-        @click="
-          {
-            currentPage = 1;
-            scrollToTop();
-          }
-        "
-        :disabled="this.currentPage === 1"
-      >
-        <uil-angle-double-left />
-      </button>
-      <button @click="previousPage" :disabled="this.currentPage === 1">
-        <uil-angle-left />
-      </button>
-      <button
-        class=""
-        @click="pageClick"
-        v-for="page in paginationRange"
-        :key="page"
-        :class="page == currentPage ? 'active' : ''"
-      >
-        {{ page }}
-      </button>
-      <button @click="nextPage" :disabled="currentPage === totalPages">
-        <uil-angle-right />
-      </button>
-      <button
-        @click="
-          {
-            currentPage = totalPages;
-            scrollToTop();
-          }
-        "
-        :disabled="currentPage === totalPages"
-      >
-        <uil-angle-double-right />
-      </button>
-    </div>
-  </div>
+  </section>
 </template>
 
 <script>
@@ -99,8 +109,9 @@ import {
   UilAngleDoubleLeft,
   UilAngleDoubleRight,
 } from "@iconscout/vue-unicons";
-
+import DisplayMessage from "./DisplayMessage.vue";
 import "vue-resize/dist/vue-resize.css";
+import data from "../utils/data.json";
 
 export default {
   name: "DisplayBooks",
@@ -108,11 +119,15 @@ export default {
     return {
       books: [],
       totalResults: 240,
-      maxResults: 40,
       currentPage: 1,
       perPage: 16,
-      searchQuery: "*",
-      API_KEY: "AIzaSyCjaKpdcjdAG_yZBm5vKvZzYoJZ41RE-vY",
+      queryParams: {
+        q: "*",
+        maxResults: 40,
+        orderBy: "relevance",
+        API_KEY: "AIzaSyB02sgmg3h44QwiaNduONxqM_gp22gKfn8",
+      },
+      queryDisplay: "",
     };
   },
   components: {
@@ -120,18 +135,15 @@ export default {
     UilAngleDoubleLeft,
     UilAngleRight,
     UilAngleDoubleRight,
+    DisplayMessage,
   },
   props: {
-    isCleared: Boolean,
-    searchedQuery: String,
+    searchParams: Object,
   },
   beforeMount() {
     this.fetchBooks(0);
   },
   computed: {
-    encodedSearchQuery() {
-      return encodeURIComponent(this.searchQuery);
-    },
     paginatedItems() {
       const start = (this.currentPage - 1) * this.perPage;
       const end = start + this.perPage;
@@ -151,37 +163,54 @@ export default {
     },
   },
   watch: {
-    isCleared() {
-      this.books = [];
-      this.searchQuery = "*";
-      this.fetchBooks(0);
-    },
-    searchedQuery(value) {
-      if (value !== "") {
-        this.books = [];
-        this.searchQuery = value;
+    searchParams({ category, keywords }) {
+      if (keywords.length) {
+        let queryParams = {
+          ...this.queryParams,
+          q: keywords.join(" "),
+          [data.categories.find((each) => each.value === category).id]:
+            keywords.join(" "),
+        };
+        this.constructQueryDisplay(keywords, category);
+        this.fetchBooks(0, queryParams);
+      } else {
+        this.queryDisplay = "";
         this.fetchBooks(0);
       }
+      this.books = [];
+      this.currentPage = 1;
     },
     currentPage() {
       this.$nextTick(() => this.putRatingOnBooks());
     },
   },
   methods: {
-    fetchBooks(startIndex) {
-      const apiURL = `https://www.googleapis.com/books/v1/volumes?q=${this.encodedSearchQuery}&key=${this.API_KEY}&startIndex=${startIndex}&maxResults=${this.maxResults}`;
+    constructQueryDisplay(keywords, category) {
+      let queryString = keywords.join(", ");
+      const replacementIndex = queryString.lastIndexOf(", ");
+      if (replacementIndex !== -1) {
+        const prefix = queryString.substring(0, replacementIndex);
+        const suffix = queryString.substring(replacementIndex + 1);
+        this.queryDisplay = ` with "${prefix} & ${suffix}" keywords in "${category.toLowerCase()}"`;
+      } else {
+        this.queryDisplay = queryString.length
+          ? ` with "${queryString}" keyword in "${category.toLowerCase()}"`
+          : "";
+      }
+    },
+    fetchBooks(startIndex, queryParams = this.queryParams) {
       axios
-        .get(apiURL)
+        .get(`https://www.googleapis.com/books/v1/volumes?`, {
+          params: { ...queryParams, startIndex: startIndex },
+        })
         .then((response) => {
-          this.books.push(...this.randomSort(response.data.items));
-          if (startIndex + this.maxResults < this.totalResults) {
-            startIndex += this.maxResults;
-            this.fetchBooks(startIndex);
+          this.books.push(...response.data.items);
+          if (startIndex + this.queryParams.maxResults < this.totalResults) {
+            startIndex += this.queryParams.maxResults;
+            this.fetchBooks(startIndex, queryParams);
           }
         })
-        .then(() => {
-          this.putRatingOnBooks();
-        })
+        .then(this.putRatingOnBooks)
         .catch((error) => {
           console.log(error);
         });
@@ -249,12 +278,14 @@ export default {
 
 <style scoped lang="scss">
 .books-container {
-  padding: 0px 60px;
+  padding: 10px 60px 0px;
   display: grid;
   justify-content: center;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-gap: 15px;
   .book-container {
+    max-height: 275px;
+    overflow: hidden;
     display: flex;
     padding: 20px;
     background-color: #fff;
@@ -358,6 +389,9 @@ export default {
     .pagination {
       grid-column: 1 / span 1;
     }
+  }
+  .display-message {
+    padding: 0px 30px;
   }
 }
 </style>

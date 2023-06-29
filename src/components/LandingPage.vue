@@ -101,13 +101,14 @@
               </tr>
             </table>
           </div>
-          <div
-            class="additional-info description"
-            v-if="book.volumeInfo.description"
-          >
+          <div class="additional-info description">
             <div class="title">Description</div>
             <hr />
-            {{ book.volumeInfo.description }}
+            {{
+              book.volumeInfo.description
+                ? book.volumeInfo.description
+                : "No description available"
+            }}
           </div>
         </div>
       </div>
@@ -115,13 +116,9 @@
     <div class="content">
       <nav>
         <header-section :header="header" />
-        <search-box @clear="isCleared = true" @searchedWith="searchFor" />
+        <search-box @searched="(params) => (searchParams = params)" />
       </nav>
-      <display-books
-        :searchedQuery="searchedQuery"
-        :isCleared="isCleared"
-        @bookClicked="showDetails"
-      />
+      <display-books :searchParams="searchParams" @bookClicked="showDetails" />
     </div>
   </div>
 </template>
@@ -132,6 +129,7 @@ import SearchBox from "./SearchBox.vue";
 import DisplayBooks from "./DisplayBooks.vue";
 import { UilShoppingCartAlt } from "@iconscout/vue-unicons";
 import { UilFileDownload } from "@iconscout/vue-unicons";
+import data from "../utils/data.json";
 
 export default {
   name: "LandingPage",
@@ -139,8 +137,10 @@ export default {
     return {
       book: {},
       modalContainer: null,
-      isCleared: true,
-      searchedQuery: "",
+      searchParams: {
+        category: data.categories[0].value,
+        keywords: [],
+      },
       previousAnimationType: null,
       animationTypes: ["one", "two", "three", "four", "five"],
       currencySymbols: {
@@ -211,9 +211,6 @@ export default {
           return;
       }
     },
-    searchFor(value) {
-      this.searchedQuery = value;
-    },
     showDetails(id, books) {
       this.book = books.find((book) => book.id === id);
       this.$nextTick(() => {
@@ -259,14 +256,6 @@ body {
   &.modal-active {
     overflow: hidden;
   }
-}
-
-.inside-scroll-area {
-  position: relative;
-  margin: auto;
-  width: 100%;
-  max-height: 200px;
-  overflow-y: scroll;
 }
 
 hr {
@@ -499,7 +488,6 @@ hr {
             margin-left: 3px;
           }
           table {
-            display: block;
             width: 100%;
             tr td:last-child {
               text-align: right;

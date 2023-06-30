@@ -1,9 +1,10 @@
 <template>
   <div class="display-message">
-    <div v-if="isLoaded">
+    <div v-if="isLoaded && !message">
       Showing all the books<span v-if="queryDisplay">{{ queryDisplay }}</span
       >:
     </div>
+    <div v-if="message">{{ message }}</div>
     <hr />
   </div>
 </template>
@@ -14,6 +15,7 @@ export default {
   props: {
     queryDisplay: String,
     isLoaded: Number,
+    message: String,
   },
 };
 </script>

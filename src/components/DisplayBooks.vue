@@ -3,6 +3,7 @@
     <display-message
       :queryDisplay="queryDisplay"
       :isLoaded="books.length"
+      :message="message"
     ></display-message>
     <div class="books-container">
       <resize-observer @notify="handleResize" />
@@ -125,9 +126,9 @@ export default {
         q: "*",
         maxResults: 40,
         orderBy: "relevance",
-        API_KEY: "AIzaSyB02sgmg3h44QwiaNduONxqM_gp22gKfn8",
       },
       queryDisplay: "",
+      message: "",
     };
   },
   components: {
@@ -175,6 +176,7 @@ export default {
         this.fetchBooks(0, queryParams);
       } else {
         this.queryDisplay = "";
+        this.message = "";
         this.fetchBooks(0);
       }
       this.books = [];
@@ -204,15 +206,32 @@ export default {
           params: { ...queryParams, startIndex: startIndex },
         })
         .then((response) => {
-          this.books.push(...response.data.items);
-          if (startIndex + this.queryParams.maxResults < this.totalResults) {
-            startIndex += this.queryParams.maxResults;
-            this.fetchBooks(startIndex, queryParams);
+          if (response.data.items !== undefined) {
+            this.books.push(...response.data.items);
+            if (startIndex + this.queryParams.maxResults < this.totalResults) {
+              startIndex += this.queryParams.maxResults;
+              this.fetchBooks(startIndex, queryParams);
+            }
+          } else {
+            throw new Error("No data");
           }
         })
         .then(this.putRatingOnBooks)
         .catch((error) => {
-          console.log(error);
+          if (error.message === "No data") {
+            this.message = `Sorry, no books are available with th${
+              this.searchParams.keywords.length > 1
+                ? "ese keywords"
+                : "is keyword"
+            } in the selected category. Try again... ⏭️`;
+          } else if (error.message === "Network Error") {
+            this.message = "Please check your internet connectivity... 😒";
+          } else if (error.response.status === 400) {
+            this.message =
+              "Internal Server Error. Please try after some time or use different search keywords...😊";
+          } else {
+            console.error(error);
+          }
         });
     },
     putRatingOnBooks() {

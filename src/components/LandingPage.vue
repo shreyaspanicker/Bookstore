@@ -546,6 +546,7 @@ hr {
     overflow-y: auto;
     padding: 20px;
     width: 90%;
+    max-height: 500px;
   }
 }
 

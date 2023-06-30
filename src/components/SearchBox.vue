@@ -30,6 +30,15 @@
       <vue-tags-input
         v-model="tag"
         :placeholder="getPlaceHolder"
+        :avoid-adding-duplicates="true"
+        :autocomplete-items="
+          this.selectedType === 'Language' ? filteredItems : []
+        "
+        :max-tags="5"
+        :add-only-from-autocomplete="
+          this.selectedType === 'Language' ? true : false
+        "
+        :separators="[',']"
         :tags="tags"
         @tags-changed="updateTags"
       />
@@ -51,6 +60,7 @@ export default {
       tags: [],
       types: data.categories,
       selectedType: data.categories[0].value,
+      languages: data.languages,
       isClosed: true,
     };
   },
@@ -64,8 +74,7 @@ export default {
     tags(value) {
       if (value.length && this.selectedType) {
         this.emitEvent(this.selectedType, value);
-      } else {
-        this.selectedType = this.types[0].value;
+      } else if (this.selectedType) {
         this.emitEvent(this.selectedType, value);
       }
     },
@@ -85,6 +94,11 @@ export default {
     },
     filteredTypes() {
       return this.types.filter((each) => each.value !== this.selectedType);
+    },
+    filteredItems() {
+      return this.languages.filter((i) => {
+        return i.text.toLowerCase().indexOf(this.tag.toLowerCase()) !== -1;
+      });
     },
   },
   methods: {
@@ -107,7 +121,14 @@ export default {
     updateStore(category, keywords) {
       const params = {
         category: category,
-        keywords: keywords.length ? keywords.map((each) => each.text) : [],
+        keywords:
+          category === "Language"
+            ? keywords.length
+              ? keywords.map((each) => each.code)
+              : []
+            : keywords.length
+            ? keywords.map((each) => each.text)
+            : [],
       };
       this.$store.commit("setSearchParams", params);
       return params;
@@ -156,9 +177,24 @@ export default {
           background-color: #2c3e50;
         }
       }
+
+      .ti-autocomplete {
+        background-color: #fff;
+        color: #2c3e50;
+        border: none;
+        max-height: 300px;
+        overflow: auto;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        font-size: 14px;
+        .ti-selected-item {
+          background-color: #2c3e50;
+          color: white;
+        }
+      }
     }
     .logo {
       cursor: pointer;
+      // transform: translateY(50%);
     }
   }
   .drop-down {

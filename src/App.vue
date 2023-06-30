@@ -58,7 +58,7 @@ body {
   /* CSS styles for small screens */
   #app {
     nav {
-      padding: 30px;
+      padding: 20px;
     }
   }
 }

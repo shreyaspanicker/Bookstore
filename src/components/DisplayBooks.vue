@@ -377,10 +377,7 @@ export default {
 }
 
 @media (max-width: 1340px) {
-  /* CSS styles for small screens */
-
   .books-container {
-    // padding: 30px;
     grid-template-columns: 1fr 1fr 1fr;
     .pagination {
       grid-column: 1 / span 3;
@@ -388,10 +385,7 @@ export default {
   }
 }
 @media (max-width: 995px) {
-  /* CSS styles for small screens */
-
   .books-container {
-    // padding: 30px;
     grid-template-columns: 1fr 1fr;
 
     .pagination {
@@ -400,17 +394,12 @@ export default {
   }
 }
 @media (max-width: 660px) {
-  /* CSS styles for small screens */
-
   .books-container {
-    padding: 30px;
+    padding: 20px;
     grid-template-columns: 1fr;
     .pagination {
       grid-column: 1 / span 1;
     }
-  }
-  .display-message {
-    padding: 0px 30px;
   }
 }
 </style>

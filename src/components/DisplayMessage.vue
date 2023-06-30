@@ -36,7 +36,8 @@ hr {
 @media (max-width: 767px) {
   /* CSS styles for small screens */
   .display-message {
-    padding: 0px 30px;
+    margin-top: 20px;
+    padding: 0px 20px;
   }
 }
 </style>

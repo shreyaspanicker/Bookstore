@@ -18,3 +18,7 @@ jobs:
         with:
           branch: ${{ github.ref }}
           folder: dist
+
+      - name: Get Published URL
+        run: |
+          echo "published_url=https://$(gh-pages-deploy --show-url)" >> $GITHUB_ENV

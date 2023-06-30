@@ -14,11 +14,16 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Deploy to GitHub Pages
+        id: gh-pages
         uses: JamesIves/github-pages-deploy-action@4.1.1
         with:
           branch: ${{ github.ref }}
           folder: dist
 
       - name: Get Published URL
-        run: |
-          echo "published_url=https://$(gh-pages-deploy --show-url)" >> $GITHUB_ENV
+        run: echo "published_url=https://$GITHUB_REPOSITORY.github.io" >> $GITHUB_ENV
+
+      - name: Set Published URL as Output
+        run: echo "::set-output name=published_url::https://$GITHUB_REPOSITORY.github.io"
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}

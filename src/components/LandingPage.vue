@@ -203,11 +203,9 @@ export default {
   },
   mounted() {
     this.modalContainer = document.getElementById("modal-container");
-    window.addEventListener("popstate", this.closeModal);
     window.addEventListener("keydown", this.handleKeydown);
   },
   beforeDestroy() {
-    window.removeEventListener("popstate", this.closeModal);
     window.removeEventListener("keydown", this.handleKeydown);
   },
   methods: {
@@ -240,7 +238,6 @@ export default {
       // this.modalContainer.classList.add(this.selectAnimation());
       this.modalContainer.classList.add("two");
       document.body.classList.add("modal-active");
-      history.pushState(null, null, "");
       this.isModalOpened = true;
     },
     closeModal(event) {
@@ -252,7 +249,6 @@ export default {
         document.body.classList.remove("modal-active");
         this.isModalOpened = false;
       }
-      history.back();
     },
     selectAnimation() {
       let randomSelection;

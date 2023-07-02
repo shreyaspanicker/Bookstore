@@ -168,7 +168,10 @@ export default {
       if (keywords.length) {
         let queryParams = {
           ...this.queryParams,
-          q: keywords.join(" "),
+          q:
+            category !== "Language"
+              ? keywords.join(" ")
+              : this.getSelectedLanguages(keywords).join(" "),
           [data.categories.find((each) => each.value === category).id]:
             keywords.join(" "),
         };
@@ -176,9 +179,9 @@ export default {
         this.fetchBooks(0, queryParams);
       } else {
         this.queryDisplay = "";
-        this.message = "";
         this.fetchBooks(0);
       }
+      this.message = "";
       this.books = [];
       this.currentPage = 1;
     },
@@ -188,7 +191,12 @@ export default {
   },
   methods: {
     constructQueryDisplay(keywords, category) {
-      let queryString = keywords.join(", ");
+      let queryString;
+      if (category === "Language") {
+        queryString = this.getSelectedLanguages(keywords).join(", ");
+      } else {
+        queryString = keywords.join(", ");
+      }
       const replacementIndex = queryString.lastIndexOf(", ");
       if (replacementIndex !== -1) {
         const prefix = queryString.substring(0, replacementIndex);
@@ -199,6 +207,11 @@ export default {
           ? ` with "${queryString}" keyword in "${category.toLowerCase()}"`
           : "";
       }
+    },
+    getSelectedLanguages(keywords) {
+      return keywords.map((each) =>
+        data.languages.find((lang) => lang.code === each).text.toLowerCase()
+      );
     },
     fetchBooks(startIndex, queryParams = this.queryParams) {
       axios
@@ -393,12 +406,25 @@ export default {
     }
   }
 }
+
+@media (max-width: 767px) {
+  .books-container {
+    padding: 10px 20px 0px;
+    .pagination {
+      grid-column: 1 / span 2;
+    }
+  }
+}
 @media (max-width: 660px) {
   .books-container {
     padding: 20px;
     grid-template-columns: 1fr;
     .pagination {
       grid-column: 1 / span 1;
+      padding: 20px 0px;
+      button {
+        margin: 4px 0px;
+      }
     }
   }
 }

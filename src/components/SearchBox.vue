@@ -16,7 +16,11 @@
           <uil-times v-else size="30px" class="logo"></uil-times>
         </span>
       </div>
-      <section id="dropdown-menu" class="dropdown-menu">
+      <section
+        id="dropdown-menu"
+        class="dropdown-menu"
+        :class="!isClosed ? 'open' : ''"
+      >
         <button
           @click="handleMenuLabelButtonClicked(type)"
           v-for="type in filteredTypes"
@@ -70,6 +74,9 @@ export default {
     UilAngleDown,
     UilTimes,
   },
+  props: {
+    closeDropDown: Boolean,
+  },
   watch: {
     tags(value) {
       if (value.length && this.selectedType) {
@@ -83,6 +90,9 @@ export default {
         this.tags = [];
         this.emitEvent(value, this.tags);
       }
+    },
+    closeDropDown(value) {
+      if (value) this.toggleDropdownButton();
     },
   },
   computed: {
@@ -105,10 +115,10 @@ export default {
     updateTags(newTags) {
       this.tags = newTags;
     },
-    toggleDropdownButton() {
+    toggleDropdownButton(event) {
       this.isClosed = !this.isClosed;
-      const menu = document.getElementById("dropdown-menu");
-      menu.classList.toggle("open");
+      this.$emit("isDropDownClosed", this.isClosed);
+      if (event) event.stopPropagation();
     },
     handleMenuLabelButtonClicked(type) {
       this.selectedType = type.value;
@@ -153,6 +163,9 @@ export default {
       position: absolute;
       top: 0;
       right: 0;
+      &:hover {
+        color: #43586c;
+      }
     }
   }
 
@@ -190,14 +203,17 @@ export default {
           background-color: #2c3e50;
           color: white;
         }
+        .ti-item > div {
+          padding: 5px;
+        }
       }
     }
     .logo {
       cursor: pointer;
-      // transform: translateY(50%);
     }
   }
   .drop-down {
+    margin-bottom: 20px;
     input {
       width: 280px;
       background-color: #fff;
@@ -221,6 +237,9 @@ export default {
       .logo {
         color: #2c3e50;
         padding: 0px;
+        &:hover {
+          color: #43586c;
+        }
       }
     }
     .dropdown-menu {

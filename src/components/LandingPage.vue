@@ -1,5 +1,5 @@
 <template>
-  <div class="section">
+  <div class="section" @click="closeDropDown = !isClosed ? true : false">
     <div id="modal-container" @click="closeModal">
       <div class="modal-background">
         <div class="modal" v-if="Object.keys(book).length">
@@ -116,7 +116,11 @@
     <div class="content">
       <nav>
         <header-section :header="header" />
-        <search-box @searched="(params) => (searchParams = params)" />
+        <search-box
+          @isDropDownClosed="closeDropDownIfOpen"
+          @searched="(params) => (searchParams = params)"
+          :closeDropDown="closeDropDown"
+        />
       </nav>
       <display-books :searchParams="searchParams" @bookClicked="showDetails" />
     </div>
@@ -141,6 +145,9 @@ export default {
         category: data.categories[0].value,
         keywords: [],
       },
+      isModalOpened: false,
+      isClosed: true,
+      closeDropDown: false,
       previousAnimationType: null,
       animationTypes: ["one", "two", "three", "four", "five"],
       currencySymbols: {
@@ -196,8 +203,19 @@ export default {
   },
   mounted() {
     this.modalContainer = document.getElementById("modal-container");
+    window.addEventListener("popstate", this.closeModal);
+    window.addEventListener("keydown", this.handleKeydown);
+  },
+  beforeDestroy() {
+    window.removeEventListener("popstate", this.closeModal);
+    window.removeEventListener("keydown", this.handleKeydown);
   },
   methods: {
+    handleKeydown(event) {
+      if (event.key === "Escape" && this.isModalOpened) {
+        this.closeModal(event);
+      }
+    },
     actionOnBooks(event) {
       const className = event.target.className;
       switch (className) {
@@ -222,12 +240,19 @@ export default {
       // this.modalContainer.classList.add(this.selectAnimation());
       this.modalContainer.classList.add("two");
       document.body.classList.add("modal-active");
+      history.pushState(null, null, "");
+      this.isModalOpened = true;
     },
     closeModal(event) {
-      if (event.target.className === "modal-background") {
+      if (
+        event.target.className === "modal-background" ||
+        event.target.className === "modal-active"
+      ) {
         this.modalContainer.classList.add("out");
         document.body.classList.remove("modal-active");
+        this.isModalOpened = false;
       }
+      history.back();
     },
     selectAnimation() {
       let randomSelection;
@@ -238,6 +263,10 @@ export default {
       } while (randomSelection === this.previousAnimationType);
       this.previousAnimationType = randomSelection;
       return this.animationTypes[randomSelection];
+    },
+    closeDropDownIfOpen(value) {
+      this.isClosed = value;
+      this.closeDropDown = false;
     },
   },
 };
@@ -542,7 +571,7 @@ hr {
   /* CSS styles for small screens */
 
   #modal-container .modal-background .modal {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: 1fr;
     overflow-y: auto;
     padding: 20px;
     width: 90%;

@@ -37,8 +37,8 @@ body {
   overflow-x: clip;
   height: 100%;
   width: 100%;
-  margin: 0px !important;
-  padding: 0px !important;
+  margin: 0px;
+  padding: 0px;
   font-family: "Fira Sans", sans-serif;
   &.modal-active {
     overflow: hidden;
